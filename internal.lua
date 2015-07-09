@@ -33,6 +33,7 @@ end
 
 local function populateStore(areas, name)
 	local store = AreaStore(name)
+	store:reserve(#areas)
 	print(dump(store))
 	for id, area in pairs(areas) do
 		store:insert_area({min = area.pos1, max = area.pos2, data = dump(id)})
