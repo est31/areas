@@ -3,6 +3,19 @@ function areas:player_exists(name)
 	return minetest.auth_table[name] ~= nil
 end
 
+function areas:enrich()
+	local self_areas_copy = {}
+	for id, area in pairs(self.areas) do
+		self_areas_copy[id] = area
+	end
+	for id, area in pairs(self_areas_copy) do
+		areas:add(area.owner, area.name .. "/copy1", area.pos1, area.pos2)
+		areas:add(area.owner, area.name .. "/copy2", area.pos1, area.pos2)
+		areas:add(area.owner, area.name .. "/copy3", area.pos1, area.pos2)
+		areas:add(area.owner, area.name .. "/copy4", area.pos1, area.pos2)
+	end
+end
+
 -- Save the areas table to a file
 function areas:save()
 	local datastr = minetest.serialize(self.areas)
@@ -18,8 +31,8 @@ function areas:save()
 	file:close()
 end
 
-local function populateStore(areas)
-	local store = AreaStore()
+local function populateStore(areas, name)
+	local store = AreaStore(name)
 	print(dump(store))
 	for id, area in pairs(areas) do
 		store:insert_area({min = area.pos1, max = area.pos2, data = dump(id)})
@@ -38,7 +51,10 @@ function areas:load()
 	if type(self.areas) ~= "table" then
 		self.areas = {}
 	end
-	areas.store = populateStore(self.areas)
+	-- areas:enrich()
+	-- areas:enrich()
+	areas.vecstore = populateStore(self.areas, "Vector")
+	areas.libstore = populateStore(self.areas, "LibSpatial")
 	file:close()
 end
 

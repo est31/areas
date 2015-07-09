@@ -1,11 +1,11 @@
 
 -- Returns a list of areas that include the provided position
-function areas:getAreasAtPos(pos, use_store)
+function areas:getAreasAtPos(pos, store_to_use)
 	local a = {}
 	local px, py, pz = pos.x, pos.y, pos.z
 	-- print(dump(areas))
-	if use_store then
-		local areas = self.store:get_areas_for_pos(pos, true, true)
+	if store_to_use then
+		local areas = store_to_use:get_areas_for_pos(pos, true, true)
 		for store_id, store_area in pairs(areas) do
 			local id = tonumber(store_area.data)
 			a[id] = self.areas[id]

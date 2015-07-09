@@ -6,6 +6,7 @@ local cnt = 0
 local avgc = 0
 local tsta = 0
 local tstb = 0
+local tstc = 0
 
 minetest.register_globalstep(function(dtime)
 	for _, player in pairs(minetest.get_connected_players()) do
@@ -13,17 +14,21 @@ minetest.register_globalstep(function(dtime)
 		local pos = vector.round(player:getpos())
 		local areaStrings = {}
 		local usta = minetest.get_us_time()
-		local arlist = areas:getAreasAtPos(pos, true)
+		local arlist = areas:getAreasAtPos(pos, areas.vecstore)
 		usta =  minetest.get_us_time() - usta
 		local ustb = minetest.get_us_time()
-		areas:getAreasAtPos(pos, false)
-		ustb =  minetest.get_us_time() - ustb
+		areas:getAreasAtPos(pos, areas.libstore)
+		ustb =  minetest.get_us_time() - ustb -----
+		local ustc = minetest.get_us_time()-----------
+		areas:getAreasAtPos(pos)
+		local ustc = minetest.get_us_time() - ustc
 		tsta = tsta + usta
 		tstb = tstb + ustb
+		tstc = tstc + ustc
 		if minetest.get_us_time() - cnt > 1000000 then
 			avgc = avgc + 1
 			cnt = minetest.get_us_time()
-			print("HEY " .. math.floor(tsta / avgc) .. " " .. math.floor(tstb / avgc))
+			print("HUD STATS vecstore=" .. math.floor(tsta / avgc) .. ", libstore=" .. math.floor(tstb / avgc) .. ", traditional=" .. math.floor(tstc / avgc))
 		end
 		for id, area in pairs(arlist) do
 			table.insert(areaStrings, ("%s [%u] (%s%s)")
