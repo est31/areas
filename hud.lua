@@ -2,12 +2,24 @@
 
 areas.hud = {}
 
+local cnt = 0
+local tst = 0
+
 minetest.register_globalstep(function(dtime)
 	for _, player in pairs(minetest.get_connected_players()) do
 		local name = player:get_player_name()
 		local pos = vector.round(player:getpos())
 		local areaStrings = {}
-		for id, area in pairs(areas:getAreasAtPos(pos)) do
+                local ust = minetest.get_us_time()
+                local arlist = areas:getAreasAtPos(pos)
+                ust =  minetest.get_us_time() - ust
+                tst = tst + ust
+                if minetest.get_us_time() - cnt > 1000000 then
+                    cnt = minetest.get_us_time()
+                    print("HEY " .. ust .. " (total " .. tst .. ") " .. #areas.areas)
+                    tst = 0
+                end
+		for id, area in pairs(arlist) do
 			table.insert(areaStrings, ("%s [%u] (%s%s)")
 					:format(area.name, id, area.owner,
 					area.open and ":open" or ""))
