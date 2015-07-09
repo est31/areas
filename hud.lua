@@ -3,22 +3,28 @@
 areas.hud = {}
 
 local cnt = 0
-local tst = 0
+local avgc = 0
+local tsta = 0
+local tstb = 0
 
 minetest.register_globalstep(function(dtime)
 	for _, player in pairs(minetest.get_connected_players()) do
 		local name = player:get_player_name()
 		local pos = vector.round(player:getpos())
 		local areaStrings = {}
-                local ust = minetest.get_us_time()
-                local arlist = areas:getAreasAtPos(pos)
-                ust =  minetest.get_us_time() - ust
-                tst = tst + ust
-                if minetest.get_us_time() - cnt > 1000000 then
-                    cnt = minetest.get_us_time()
-                    print("HEY " .. ust .. " (total " .. tst .. ") " .. #areas.areas)
-                    tst = 0
-                end
+		local usta = minetest.get_us_time()
+		local arlist = areas:getAreasAtPos(pos, true)
+		usta =  minetest.get_us_time() - usta
+		local ustb = minetest.get_us_time()
+		areas:getAreasAtPos(pos, false)
+		ustb =  minetest.get_us_time() - ustb
+		tsta = tsta + usta
+		tstb = tstb + ustb
+		if minetest.get_us_time() - cnt > 1000000 then
+			avgc = avgc + 1
+			cnt = minetest.get_us_time()
+			print("HEY " .. math.floor(tsta / avgc) .. " " .. math.floor(tstb / avgc))
+		end
 		for id, area in pairs(arlist) do
 			table.insert(areaStrings, ("%s [%u] (%s%s)")
 					:format(area.name, id, area.owner,

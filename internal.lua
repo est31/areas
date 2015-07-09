@@ -18,6 +18,15 @@ function areas:save()
 	file:close()
 end
 
+local function populateStore(areas)
+	local store = AreaStore()
+	print(dump(store))
+	for id, area in pairs(areas) do
+		store:insert_area({min = area.pos1, max = area.pos2, data = dump(id)})
+	end
+	return store
+end
+
 -- Load the areas table from the save file
 function areas:load()
 	local file, err = io.open(self.config.filename, "r")
@@ -29,6 +38,7 @@ function areas:load()
 	if type(self.areas) ~= "table" then
 		self.areas = {}
 	end
+	areas.store = populateStore(self.areas)
 	file:close()
 end
 
