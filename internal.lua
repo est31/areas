@@ -18,6 +18,22 @@ function areas:save()
 	file:close()
 end
 
+local function populateStore(self)
+	if not minetest.get_areastore_typenames then
+		return
+	end
+	local store = AreaStore()
+	local store_ids = {}
+	store:reserve(#self.areas)
+	for id, area in pairs(areas.areas) do
+		local sid = store:insert_area({min = area.pos1,
+			max = area.pos2, data = dump(id)})
+		store_ids[id] = sid
+	end
+	self.store = store
+	self.store_ids = store_ids
+end
+
 -- Load the areas table from the save file
 function areas:load()
 	local file, err = io.open(self.config.filename, "r")
@@ -29,6 +45,7 @@ function areas:load()
 	if type(self.areas) ~= "table" then
 		self.areas = {}
 	end
+	populateStore(self)
 	file:close()
 end
 
@@ -46,6 +63,12 @@ function areas:add(owner, name, pos1, pos2, parent)
 	local id = findFirstUnusedIndex(self.areas)
 	self.areas[id] = {name=name, pos1=pos1, pos2=pos2, owner=owner,
 			parent=parent}
+	-- add to AreaStore
+	if self.store then
+		local sid = self.store:insert_area({min = pos1, max = pos2,
+			data = dump(id)})
+		self.store_ids[id] = sid
+	end
 	return id
 end
 
@@ -73,6 +96,13 @@ function areas:remove(id, recurse)
 
 	-- Remove main entry
 	self.areas[id] = nil
+
+	-- remove from AreaStore
+	if self.store then
+		local sid = self.store_ids[id]
+		self.store_ids[id] = nil
+		self.store:remove_area(sid)
+	end
 end
 
 -- Checks if a area between two points is entirely contained by another area
